@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Companies</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+    <p></p>
+    <h1>List of Companies</h1>
+    <div class="panel panel-default panel-table">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col col-xs-2">
+                    <h3 class="panel-title">Company Filter</h3>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form action="{{ url_for('ApiConvUser.get_companylists') }}" method="get" class="form-inline">
+                <div class="col col-xs-10">
+                    <div>
+                        <p>
+                            <select name="global_control_point">
+                                <option value="">-- Select Global Control Point --</option>
+                                {% for opt in global_control_point_options %}
+                                <option value="{{ opt }}" {% if selected_global_control_point == opt %} selected="selected" {% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name="cmg_segment_name">
+                                <option value="">-- Select CMG Segment Name --</option>
+                                {% for opt in cmg_segment_name_options %}
+                                <option value="{{ opt }}" {% if selected_cmg_segment_name == opt %} selected="selected" {% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name="client_tier">
+                                <option value="">-- Select Client Tier --</option>
+                                {% for opt in client_tier_options %}
+                                <option value="{{ opt }}" {% if selected_client_tier == opt %} selected="selected" {% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+                            {% set selected_year = selected_year|int  %}
+                            <select name="year">
+                                <option value="">-- Select Year --</option>
+                                {% for opt in range(2014, 2016, 1) %}
+                                <option value="{{ opt }}" {% if selected_year == opt %} selected="selected" {% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                        <p>
+                            Revenue between <input type="text" name="revenue_start" {% if selected_revenue_start != 'None' %} value="{{ selected_revenue_start }}" {% endif %}> and <input type="text" name="revenue_end" {% if selected_revenue_end != 'None' %} value="{{ selected_revenue_end }}" {% endif %}>
+                        </p>
+                        <p>
+                            Deposits between <input type="text" name="deposits_start" {% if selected_deposits_start != 'None' %} value="{{ selected_deposits_start }}" {% endif %} > and <input type="text" name="deposits_end" {% if selected_deposits_end != 'None' %} value="{{ selected_deposits_end }}" {% endif %}>
+                        </p>
+                    </div>
+                    <button type="submit" name="filtersearch" value="yes" class="btn btn-sm btn-primary btn-create">Filter</button>
+                </div>
+            </form>
+            <hr>
+            <hr>
+            <table id="listcompanies" class="table table-striped table-bordered table-list">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>CMG Unmasked Name</th>
+                    <th>Client Tier</th>
+                    <th>CMG Global BU</th>
+                    <th>CMG Segment Name</th>
+                    <th>Global Control Point</th>
+                    <th>REVENUE FY14</th>
+                    <th>REVENUE FY15X</th>
+                    <th>Deposits EOP FY14</th>
+                    <th>Deposits EOP FY15x</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for company in company_list %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><a href="{{ url_for('ApiConvUser.get_companydetail', id=company.CMGUnmaskedID) }}">{{ company.CMGUnmaskedName }}</a></td>
+                    <td>{{ company.ClientTier }}</td>
+                    <td>{{ company.CMGGlobalBU }}</td>
+                    <td>{{ company.CMGSegmentName }}</td>
+                    <td>{{ company.GlobalControlPoint }}</td>
+                    <td>{{ company.REVENUE_FY14 }}</td>
+                    <td>{{ company.REVENUE_FY15X }}</td>
+                    <td>{{ company[' Deposits_EOP_FY14'] }}</td>
+                    <td>{{ company[' Deposits_EOP_FY15x'] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+    </div>
+</div>
+</body>
+</html>

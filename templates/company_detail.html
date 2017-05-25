@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Company Detail</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    {% if (company_detail.REVENUE_FY14 is not number) or (company_detail.REVENUE_FY15X is not number): %}
+        {% set revenue14 = company_detail.REVENUE_FY14.replace(',','') %}
+        {% set revenue15 = company_detail.REVENUE_FY15X.replace(',','') %}
+    {% else: %}
+        {% set revenue14 = company_detail.REVENUE_FY14 %}
+        {% set revenue15 = company_detail.REVENUE_FY15X %}
+    {% endif %}
+    <div class="row">
+        <h1>Company Detail</h1>
+        <div class="panel panel-default panel-table">
+            <div class="panel-heading">{{ company_detail.CMGUnmaskedName }}</div>
+            <div class="panel-body">
+                <table>
+                    {% for column_name in list_column_name: %}
+                    <tr>
+                        <td>{{ column_name }}</td>
+                        <td>{{ company_detail[column_name] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <hr>
+                <a href="#" onclick="show()">Click to Update Revenue</a>
+                <div id = "div_update_revenue" style="display:none">
+                    <h3>Update Revenue</h3>
+                    <form action="{{ url_for('ApiConvUser.update_companydetail', id=company_detail.CMGUnmaskedID) }}" method="post">
+                        <div class="form-group row">
+                            <label for="new_revenue_14" class="col-sm-2 col-form-label">Revenue for 2014</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" value="{{ company_detail.REVENUE_FY14 }}" name="new_revenue_14" placeholder="Revenue for 2014">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="new_revenue_15" class="col-sm-2 col-form-label">Revenue for 2015</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" value="{{ company_detail.REVENUE_FY15X }}" name="new_revenue_15">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                      </form>
+                </div>
+            </div>
+            <div id="revenue_chart" style="height:400px; width:100%;"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+	window.onload = function() {
+		var chart = new CanvasJS.Chart("revenue_chart", {
+			title: {
+				text: "Revenue Chart"
+			},
+			axisX: {
+				interval: 1,
+				intervalType: "year"
+			},
+			data: [{
+				type: "line",
+				xValueFormatString:"YYYY",
+				dataPoints: [
+				  { x: new Date(2014, 0, 0), y: {{ revenue14 }} },
+				  { x: new Date(2015, 0, 0), y: {{ revenue15 }} },
+				]
+			}],
+			toolTip:{ content:"Revenue : {y}" },
+		});
+		chart.render();
+	}
+    function show() {
+        var x = document.getElementById('div_update_revenue');
+        if (x.style.display === 'none') {
+            x.style.display = 'block';
+        } else {
+            x.style.display = 'none';
+        }
+    }
+    </script>
+    <script src="{{ url_for('static', filename='js/canvasjs.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+</html>
